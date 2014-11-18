@@ -17,12 +17,12 @@ public class Player : MonoBehaviour, IView, IStateController
 
 	public void Init()
 	{
-		MainFsm.StateChange(gameObject.AddComponent<PlayerSafeState>());
+		MainFsm.StateChange(gameObject.AddComponent<PlayerNormalState>());
 	}
 
 	public void Dispose()
 	{
-		Destroy(this);
+		Destroy(gameObject);
 	}
 
 	public void Notify(IEvent evt)
@@ -35,7 +35,4 @@ public class Player : MonoBehaviour, IView, IStateController
 		GameController.Instance.AddView(this);
 	}
 
-	private void Update()
-	{
-	}
 }

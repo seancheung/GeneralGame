@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class PlayerSafeState : MonoBehaviour, IGameState
+public class PlayerNormalState : MonoBehaviour, IGameState
 {
 	public void OnEnter()
 	{

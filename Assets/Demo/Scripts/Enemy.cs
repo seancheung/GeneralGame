@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyView : MonoBehaviour, IView, IStateController
+public class Enemy : MonoBehaviour, IView, IStateController
 {
 	public GameFSM MainFsm { get; private set; }
+	public float speed;
 
 	public string Name
 	{
@@ -16,11 +17,12 @@ public class EnemyView : MonoBehaviour, IView, IStateController
 
 	public void Init()
 	{
+		MainFsm.StateChange(gameObject.AddComponent<EnemyNormalState>());
 	}
 
 	public void Dispose()
 	{
-		Destroy(this);
+		Destroy(gameObject);
 	}
 
 	public void Notify(IEvent evt)

@@ -25,14 +25,22 @@ public class GameScene : MonoBehaviour, IView, IGameState
 
 	public void Init()
 	{
+		gameObject.AddComponent<MatManager>();
 	}
 
 	public void Dispose()
 	{
 		Destroy(this);
+		Destroy(gameObject.GetComponent<EnemySpawner>());
 	}
 
 	public void Notify(IEvent evt)
 	{
+	}
+
+	private void OnLevelWasLoaded(int level)
+	{
+		if (level == 1)
+			gameObject.AddComponent<EnemySpawner>();
 	}
 }

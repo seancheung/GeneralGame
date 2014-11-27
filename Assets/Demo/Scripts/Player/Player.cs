@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour, IView, IStateController
+public class Player : MonoBehaviour, IView, IStateController
 {
 	public GameFSM MainFsm { get; private set; }
-	public float speed;
 
 	public string Name
 	{
@@ -13,12 +12,15 @@ public class Enemy : MonoBehaviour, IView, IStateController
 	}
 
 	public EventDispatcher Dispatcher { get; set; }
+
 	public List<string> EventList { get; private set; }
 
 	public void Init()
 	{
-		MainFsm.StateChange(gameObject.AddComponent<EnemyNormalState>());
+		EventList = new List<string> {EventCenter.PlayerGetHit};
+		MainFsm.StateChange(gameObject.AddComponent<PlayerNormalState>());
 	}
+
 
 	public void Dispose()
 	{
@@ -27,6 +29,11 @@ public class Enemy : MonoBehaviour, IView, IStateController
 
 	public void Notify(IEvent evt)
 	{
+		switch (evt.Name)
+		{
+			case EventCenter.PlayerGetHit:
+				break;
+		}
 	}
 
 	private void Start()

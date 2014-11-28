@@ -10,7 +10,6 @@ public class UIHealthbar : MonoBehaviour
 	private UISprite _barSprite;
 	private const float AnimDuration = 0.2f;
 	private const iTween.EaseType EaseType = iTween.EaseType.linear;
-	private float _shieldMod;
 	private bool _isFading;
 	private float _timer;
 
@@ -90,6 +89,9 @@ public class UIHealthbar : MonoBehaviour
 		set { _shieldedDmg.gameObject.SetActive(value); }
 	}
 
+	/// <summary>
+	/// 是否正在掉血
+	/// </summary>
 	public bool IsDamaging
 	{
 		get { return IsShieldedDamaging || IsNormalDamaging; }
@@ -144,13 +146,14 @@ public class UIHealthbar : MonoBehaviour
 			IsVisible = true;
 		}
 
-		//若将增加的护盾值使总值超过100%
-		if (_normal.value + percent + _shieldMod > 1f)
+		//若将增加的护盾值使总值超过100%,重新计算百分比
+		if (_normal.value + percent > 1f)
 		{
-			percent = _normal.value + percent + _shieldMod - 1;
-			_normal.value -= percent;
-			_shieldMod += percent;
+			var total = _normal.value + percent;
+			_normal.value /= total;
+			percent /= total;
 		}
+
 		//若已中毒
 		if (IsPoisoned)
 		{
@@ -168,7 +171,6 @@ public class UIHealthbar : MonoBehaviour
 		IsShielded = true;
 		iTween.ValueTo(gameObject,
 			iTween.Hash("from", 0, "to", time, "time", time, "onupdate", "OnShield", "oncomplete", "ShieldTimeOut",
-				"oncompleteparams", _shieldMod,
 				"oncompletetarget", gameObject));
 	}
 
@@ -179,28 +181,34 @@ public class UIHealthbar : MonoBehaviour
 	/// <param name="speed">下降速度(刻度/秒)</param>
 	public void AddPoison(float percent, float speed)
 	{
+		if (percent <= 0)
+		{
+			return;
+		}
+
 		if (!IsVisible)
 		{
 			IsVisible = true;
 		}
 
-		//若已加护盾
+		////若已加护盾
+		//if (IsShielded)
+		//{
+		//	//若将要增加的中毒值大于护盾值
+		//	if (percent > _shielded.value)
+		//	{
+		//		percent -= _shielded.value;
+		//	}
+		//	else //否则
+		//	{
+		//		percent = _shielded.value - percent;
+		//	}
+		//}
 		if (IsShielded)
 		{
-			//若将要增加的中毒值大于护盾值
-			if (percent > _shielded.value)
-			{
-				percent -= _shielded.value;
-			}
-			else //否则
-			{
-				percent = _shielded.value - percent;
-			}
+			_shielded.value -= percent;
 		}
-		if (percent < 0)
-		{
-			return;
-		}
+
 		_normal.value -= percent;
 		IsPoisoned = true;
 		iTween.ValueTo(gameObject,
@@ -282,13 +290,9 @@ public class UIHealthbar : MonoBehaviour
 	{
 	}
 
-	private void ShieldTimeOut(float modPercent)
+	private void ShieldTimeOut()
 	{
-		_shieldMod = Mathf.Max(0, _shieldMod - modPercent);
-		_normal.value += modPercent;
 		IsShielded = false;
-		_shielded.value = _normal.value;
-		_shieldedDmg.value = _normal.value;
 	}
 
 	private void OnPoison(float value)
